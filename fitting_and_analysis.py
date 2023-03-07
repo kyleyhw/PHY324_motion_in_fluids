@@ -78,7 +78,7 @@ class Output():
         # else:
         #     result = float(result)
         # return result
-        result = np.format_float_positional(num, precision=sf, fractional=False, trim='-')
+        result = np.format_float_positional(num, precision=sf, fractional=False, trim='-', min_digits=sf)
         # if '.' in result:
         #     result = float(result)
         # else:

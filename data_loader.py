@@ -19,7 +19,7 @@ class DataLoader():
         raw_times = cff.remove_systematic_error(raw_times)
 
         self.y = raw_positions
-        self.y_error = np.zeros_like(self.y) + 0.5
+        self.y_error = np.zeros_like(self.y) + 0.0005
 
         self.x = raw_times
         self.x_error = np.zeros_like(self.x) + 0.005

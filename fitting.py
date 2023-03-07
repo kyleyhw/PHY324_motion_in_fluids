@@ -3,7 +3,7 @@ from scipy.optimize import curve_fit
 from matplotlib import rc
 font = {'family' : 'DejaVu Sans',
         'weight' : 'normal',
-        'size'   : 28}
+        'size'   : 16}
 rc('font', **font)
 from matplotlib.offsetbox import AnchoredText
 
@@ -37,22 +37,22 @@ class Fitting():
         Output.baseplot_errorbars(ax=ax, x=self.x, y=self.y_measured, yerr=self.y_error, xerr=self.x_error, label='data')
 
         if plot_fit:
-            x_for_plotting_fit = np.linspace(*ax.get_xlim(), 10000)
+            x_for_plotting_fit = np.linspace(self.x[0], self.x[-1], 10000)
 
             ax.plot(x_for_plotting_fit, self.fitted_function(x_for_plotting_fit), label='fit', linewidth=3)
 
             info_sigfigs = 3
-            info_fontsize = 28
+            info_fontsize = 14
 
             info_on_ax = self.fitted_function.parameter_info + \
                          '\n$\chi^2$ / DOF = ' + str(Output.to_sf(self.cfa.raw_chi2, sf=info_sigfigs)) + ' / ' + str(self.cfa.degrees_of_freedom) + ' = ' + str(Output.to_sf(self.cfa.reduced_chi2, sf=info_sigfigs)) + \
-                         '\n$\chi^2$ prob = ' + str(Output.to_sf(self.cfa.chi2_probability, sf=info_sigfigs))
+                         '\n$\chi^2$ prob = ' + str(np.format_float_positional(self.cfa.chi2_probability, precision=info_sigfigs, trim='k', min_digits=info_sigfigs))
 
 
-            ax_text = AnchoredText(info_on_ax, loc='lower left', frameon=False, prop=dict(fontsize=info_fontsize))
+            ax_text = AnchoredText(info_on_ax, loc='upper left', frameon=False, prop=dict(fontsize=info_fontsize))
             ax.add_artist(ax_text)
 
-        ax.legend()
+        ax.legend(loc='upper right')
 
     def plot_residuals(self, ax):
 
