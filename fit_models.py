@@ -2,7 +2,7 @@ import numpy as np
 import fitted_models
 
 
-class Gaussian():  # height is usually 1; not probability density
+class Gaussian:  # height is usually 1; not probability density
     def __init__(self):
         self.number_of_parameters = 4
         self.CorrespondingFittedFunction = fitted_models.Gaussian
@@ -12,7 +12,7 @@ class Gaussian():  # height is usually 1; not probability density
         return result
 
 
-class GaussianZeroCenter():  # height is usually 1; not probability density
+class GaussianZeroCenter:  # height is usually 1; not probability density
     def __init__(self):
         self.number_of_parameters = 3
         self.CorrespondingFittedFunction = fitted_models.GaussianZeroCenter
@@ -22,7 +22,7 @@ class GaussianZeroCenter():  # height is usually 1; not probability density
         return result
 
 
-class Linear():
+class Linear:
     def __init__(self):
         self.number_of_parameters = 2
         self.CorrespondingFittedFunction = fitted_models.Linear
@@ -40,8 +40,17 @@ class Proportional:
         result = m * x
         return result
 
+class Constant:
+    def __init__(self):
+        self.number_of_parameters = 1
+        self.CorrespondingFittedFunction = fitted_models.Constant
 
-class DecayingSinusoid():
+    def __call__(self, x, c):
+        result = c
+        return result
+
+
+class DecayingSinusoid:
     def __init__(self):
         self.number_of_parameters = 5
         self.CorrespondingFittedFunction = fitted_models.DecayingSinusoid
