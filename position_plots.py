@@ -24,9 +24,6 @@ def set_position_axes_labels(axs):
     for ax in axs:
         ax.set_yticks([0.000, 0.125, 0.250])
 
-def set_velocity_axes_labels(axs):
-    axs[2].set_ylabel('velocity / m s $^{-1}$')
-    axs[-1].set_xlabel('time / s')
 
 def set_residual_axes_labels(axs):
     axs[2].set_ylabel('residual / m')
@@ -59,7 +56,7 @@ def plot_raw_all_beads(show=False, save=False):
         for bead_number in bead_numbers:
             plot_raw_for_bead(fluid=fluid, bead_number=bead_number, show=show, save=save)
 
-def plot_fit_graph(main_ax, residuals_ax, fluid, bead_number, trial, model):
+def plot_fit_graph(main_ax, residuals_ax, fluid, bead_number, trial, model, write):
     filename = '%s/%s' % (fluid, fluid + 'bead' + str(bead_number) + 't' + str(trial))
     data = data_loader.DataLoader(filename)
 
@@ -73,21 +70,26 @@ def plot_fit_graph(main_ax, residuals_ax, fluid, bead_number, trial, model):
     fit.plot_residuals(ax=residuals_ax)
     residuals_ax.grid()
 
-def plot_fit_for_bead(model, fluid, bead_number, show=False, save=False):
+    if write:
+        file = open('velocities.txt', 'a')
+        data_string = str(fluid) + ',' + str(bead_number) + ',' + str(fit.fitted_function.m) + ',' + str(fit.fitted_function.m_error) + '\n'
+        file.write(data_string)
+
+def plot_fit_for_bead(model, fluid, bead_number, show=False, save=False, write=False):
     number_of_trials = 5
     trials = range(1, number_of_trials+1)
     fig, axs = plt.subplots(number_of_trials, 1, figsize=(16,9), sharex=True)
     residuals_fig, residuals_axs = plt.subplots(number_of_trials, 1, figsize=(16, 9), sharex=True)
+
     for i in trials:
         index = i-1
-        plot_fit_graph(main_ax=axs[index], residuals_ax=residuals_axs[index], fluid=fluid, bead_number=bead_number, trial=i, model=model)
+        plot_fit_graph(main_ax=axs[index], residuals_ax=residuals_axs[index], fluid=fluid, bead_number=bead_number, trial=i, model=model, write=write)
 
     fig.suptitle('Position vs time for bead size %s in %s' %(str(bead_number), fluid))
 
     set_position_axes_labels(axs=axs)
 
     residuals_fig.suptitle('Residuals for bead  size %s in %s' %(str(bead_number), fluid))
-
 
     set_residual_axes_labels(axs=residuals_axs)
 
@@ -98,67 +100,22 @@ def plot_fit_for_bead(model, fluid, bead_number, show=False, save=False):
         fig.show()
         residuals_fig.show()
 
-def plot_fit_all_beads(model, show=False, save=False):
+
+def plot_fit_all_beads(model, show=False, save=False, write=False):
+    if write:
+        file = open('velocities.txt', 'w')
+        file.write('# fluid, bead_number, velocity, velocity error \n')
+
     for fluid in fluids:
         for bead_number in bead_numbers:
-            plot_fit_for_bead(model=model, fluid=fluid, bead_number=bead_number, show=show, save=save)
+            plot_fit_for_bead(model=model, fluid=fluid, bead_number=bead_number, show=show, save=save, write=write)
 
-def plot_velocity_graph(main_ax, residuals_ax, fluid, bead_number, trial, model):
-    filename = '%s/%s' % (fluid, fluid + 'bead' + str(bead_number) + 't' + str(trial))
-    data = data_loader.DataLoader(filename)
-
-    units_for_parameters = ('m / s')
-
-    velocities = np.diff(data.y) / np.diff(data.x)
-    velocities_error = np.zeros_like(velocities) + 0.001
-
-    times = data.y[:-1]
-    times_error = data.y_error[:-1]
+    if write:
+        file.close()
 
 
-    fit = fitting.Fitting(model=model, x=times, x_error=times_error, y_measured=velocities, y_error=velocities_error,
-                          units_for_parameters=units_for_parameters)
 
-    fit.scatter_plot_data_and_fit(ax=main_ax)
+plot_raw_all_beads(show=False, save=True)
 
-    fit.plot_residuals(ax=residuals_ax)
-    residuals_ax.grid()
-
-def plot_velocity_for_bead(model, fluid, bead_number, show=False, save=False):
-    number_of_trials = 5
-    trials = range(1, number_of_trials+1)
-    fig, axs = plt.subplots(number_of_trials, 1, figsize=(16,9), sharex=True)
-    residuals_fig, residuals_axs = plt.subplots(number_of_trials, 1, figsize=(16, 9), sharex=True)
-    for i in trials:
-        index = i-1
-        plot_velocity_graph(main_ax=axs[index], residuals_ax=residuals_axs[index], fluid=fluid, bead_number=bead_number, trial=i, model=model)
-
-    fig.suptitle('Velocity vs time for bead size %s in %s' %(str(bead_number), fluid))
-
-    set_velocity_axes_labels(axs=axs)
-
-    residuals_fig.suptitle('Residuals for bead  size %s in %s' %(str(bead_number), fluid))
-
-
-    set_residual_axes_labels(axs=residuals_axs)
-
-    if save:
-        fig.savefig('plots/velocity_plots/%s.png' %(fluid + '_bead' + str(bead_number) + '_velocity_plots'))
-        residuals_fig.savefig('plots/velocity_residuals/%s.png' %(fluid + '_bead' + str(bead_number) + '_velocity_plots'))
-    if show:
-        fig.show()
-        residuals_fig.show()
-
-def plot_velocity_all_beads(model, show=False, save=False):
-    for fluid in fluids:
-        for bead_number in bead_numbers:
-            plot_velocity_for_bead(model=model, fluid=fluid, bead_number=bead_number, show=show, save=save)
-
-
-# plot_raw_all_beads(show=False, save=True)
-#
-# model = fit_models.Linear()
-# plot_fit_all_beads(model=model, show=False, save=True)
-
-model = fit_models.Constant()
-plot_velocity_all_beads(model=model, show=False, save=True)
+model = fit_models.Linear()
+plot_fit_all_beads(model=model, show=False, save=True, write=True)
