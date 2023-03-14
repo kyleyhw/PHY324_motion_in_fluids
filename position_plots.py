@@ -74,6 +74,7 @@ def plot_fit_graph(main_ax, residuals_ax, fluid, bead_number, trial, model, writ
         file = open('velocities.txt', 'a')
         data_string = str(fluid) + ',' + str(bead_number) + ',' + str(fit.fitted_function.m) + ',' + str(fit.fitted_function.m_error) + '\n'
         file.write(data_string)
+        file.close()
 
 def plot_fit_for_bead(model, fluid, bead_number, show=False, save=False, write=False):
     number_of_trials = 5
@@ -105,13 +106,11 @@ def plot_fit_all_beads(model, show=False, save=False, write=False):
     if write:
         file = open('velocities.txt', 'w')
         file.write('# fluid, bead_number, velocity, velocity error \n')
+        file.close()
 
     for fluid in fluids:
         for bead_number in bead_numbers:
             plot_fit_for_bead(model=model, fluid=fluid, bead_number=bead_number, show=show, save=save, write=write)
-
-    if write:
-        file.close()
 
 
 
